@@ -1,12 +1,9 @@
 # `thermal-camera`
 
-Firmware for my hand-rolled LWIR camera, based on ESP32 and FLIR Lepton 3.
+Upgraded firmware for ESP32 based thermal camera originaly designed by [themainframe](damow.net).
+Original firmware can be found [here](https://github.com/themainframe/thermal-camera).
 
-The thermal camera driver is mostly ported from my previous [leptonic](https://github.com/themainframe/leptonic) code.
-
-For (much) more information, see my blog post on [damow.net](https://damow.net/building-a-thermal-camera).
-
-I compiled my firmware against the [ESP32 IoT Development Framework](https://github.com/espressif/esp-idf), release `v3.0-rc1` with toolchain version 1.22.0-75-gbaf03c2. The compilation should work fine on any platform, but for reference I had success on Mac OS X and Linux.
+Toolchain used and the way of building are the same as in the original.
 
 ## Building
 
