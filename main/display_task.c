@@ -12,6 +12,7 @@
 #include "display/gui/gui.h"
 #include "display/palettes/palettes.h"
 #include "display/render.h"
+#include "display_task.h"
 
 /*
  * This task drives the display update pipeline.
@@ -27,9 +28,22 @@ void display_task(c_frame_t* c_frame)
 {
   ESP_LOGI(TAG, "start DisplayTask...");
   display_init();
+  gpio_set_direction(PIN_NUM_PALETTE, GPIO_MODE_INPUT); // Set pallete change button
+  int16_t actual_palette = 0;
 
   for (;;) {
-
+    
+    // Changing a pallete
+    if(PIN_NUM_PALETTE) {
+        if (actual_palette < PALETTE_COUNT) {
+            actual_palette++;
+        }
+        else {
+            actual_palette = 0;
+        }
+        vTaskDelay(100 / portTICK_RATE_MS);
+    }
+    
     // Wait for a frame to be available
     if (xSemaphoreTake(c_frame->sem, 1000) == pdTRUE) {
 

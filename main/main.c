@@ -7,6 +7,7 @@
 #include "user_task.h"
 #include "shared_frame.h"
 #include "softpower.h"
+#include "driver/adc.h"
 
 static c_frame_t c_frame;
 
@@ -27,6 +28,10 @@ void app_main()
 
   // Turn on the display and camera power
   softpower_pf_on();
+
+  // Setting of ADC low batt checker
+  adc1_config_width(ADC_WIDTH_BIT_9);
+  adc1_config_channel_atten(ADC1_CHANNEL_6, ADC_ATTEN_DB_6);
 
   // Start tasks
   xTaskCreate(&vospi_task, "vospi_task", 30000, &c_frame, 5, NULL);

@@ -11,6 +11,12 @@
 #include "softpower.h"
 #include "display/gui/gui.h"
 #include "display/render.h"
+#include "driver/adc.h"
+#include "include/user_task.h"
+#include "esp_partition.h"
+#include "esp_err.h"
+#include "nvs_flash.h"
+#include "nvs.h"
 
 /*
  * This task handles interaction from the user via the touch screen/buttons.
@@ -20,17 +26,20 @@ static const char* TAG = "UserTask";
 
 void user_task()
 {
-  // Add a rectangle component to the GUI (testing)
-  gui_comp_t* heartbeat_pip_comp = malloc(sizeof(gui_comp_t));
-  heartbeat_pip_comp->visible = true;
-  heartbeat_pip_comp->left = 10;
-  heartbeat_pip_comp->top = 10;
-  heartbeat_pip_comp->text = NULL;
-  heartbeat_pip_comp->rectangle = malloc(sizeof(gui_comp_rectangle_t));
-  heartbeat_pip_comp->rectangle->width = 10;
-  heartbeat_pip_comp->rectangle->height = 8;
-  heartbeat_pip_comp->rectangle->fill_colour = RGB_TO_16BIT(0, 255, 0);
-  gui_add_comp(heartbeat_pip_comp);
+  bool DeadBatt = false;
+  int16_t MinBatt = 418; // Value 512 equals to 2.2V (4.4V before voltage divider), there comes value 418 (1.8V or 3.6V respectively)
+
+  // Add a LOW BATT sign component
+  gui_comp_t* batt_pip_comp = malloc(sizeof(gui_comp_t));
+  batt_pip_comp->visible = false;
+  batt_pip_comp->left = 124;
+  batt_pip_comp->top = 5;
+  batt_pip_comp->text = malloc(sizeof(gui_comp_text_t));
+  strcpy(batt_pip_comp->text->text, "LOW BATT!");
+  ESP_LOGW(TAG, "Battery voltage low!");
+  batt_pip_comp->text->colour = RGB_TO_16BIT(255, 0, 0);
+  batt_pip_comp->rectangle = NULL;
+  gui_add_comp(batt_pip_comp);
 
   for(;;) {
 
@@ -44,9 +53,10 @@ void user_task()
     }
     #endif
 
-    // Flash the heartbeat pip
-    heartbeat_pip_comp->visible = !heartbeat_pip_comp->visible;
-
-    vTaskDelay(1000 / portTICK_RATE_MS);
+    // Check battery voltage
+    if (adc1_get_raw(ADC1_CHANNEL_6) < MinBatt && DeadBatt == false) {
+      batt_pip_comp->visible = true;
+      DeadBatt = true;
+    }
   }
 }

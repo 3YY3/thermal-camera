@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define PALETTE_COUNT 1
+#define PALETTE_COUNT 5
 
 typedef const uint8_t palette_map_t[255][3];
 
